@@ -103,11 +103,14 @@ void Client::setup()
 
 void Client::write_line(const QByteArray &a)
 {
-  if (a.startsWith("login")) {
+  int u = a.indexOf("login");
+  if (u > -1) {
     QByteArray t(a);
-    int x = t.indexOf(' ', 6);
-    t.truncate(x+1);
+    int x = t.indexOf(' ', u+6);
+    if (x > -1)
+      t.truncate(x+1);
     t.append("***");
+    EMITDEBUG(QString::fromUtf8(t) + '\n');
   } else
     EMITDEBUG(QString::fromUtf8(a) + '\n');
   socket->write(a + "\r\n");
