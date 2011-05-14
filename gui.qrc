@@ -1,0 +1,8 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/">
+   <file>icons/applications-multimedia.svg</file>
+   <file>icons/mail-forward.svg</file>
+   <file>icons/mail-message-new.svg</file>
+   <file>icons/process-stop.svg</file>
+</qresource>
+</RCC>
