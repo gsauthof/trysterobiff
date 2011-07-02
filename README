@@ -78,8 +78,24 @@ an additional CA root certificate, in case that it is not available systemwide.
 If you have problems to identify the root SSL-certficate the server certificate
 was signed with, check out the notes at the end of:
 
-https://bitbucket.org/gsauthof/mailcp/src/727b68c8878b/README
+https://bitbucket.org/gsauthof/mailcp/overview 
 
+## Multiple Account ##
+
+If you want to use multiple Trysterobiff instances (for multiple IMAP
+accounts), just set the HOME environment variable like this:
+
+    $ HOME=/home/juser/accountb ./trysterobiff
+
+Assuming that /home/juser/accountb/.config/trysterobiff.conf is setup.
+
+Perhaps it makes sense to add an option to Trysterobiff for user defined config file names under $HOME/.conf/.
+
+
+## Tested IMAP-Servers ##
+
+* Cyrus IMAP v2.3.13
+* [Dovecot][dove] 1.2.9
 
 ## Misc ##
 
@@ -90,5 +106,5 @@ https://bitbucket.org/gsauthof/mailcp/src/727b68c8878b/README
 
 
 [tango]: http://tango.freedesktop.org/Tango_Desktop_Project
-
+[dove]: http://www.dovecot.org/
 
