@@ -15,14 +15,14 @@ mail arrival.
 Trysterobiff is written in C++ and uses the Qt library (version 4.x). It is
 licenced under the GPL v3+.
 
-2011-01-08
+2011-01-08, 2013-03-05
 
 
 ## Contact ##
 
 I appreciate feedback and comments:
 
-    gsauthof@techfak.uni-bielefeld.de
+    mail@georg.so
     gsauthof@sdf.lonestar.org
 
 
@@ -118,6 +118,7 @@ Perhaps it makes sense to add an option to Trysterobiff for user defined config 
 
 * Cyrus IMAP v2.3.13
 * [Dovecot][dove] 1.2.9
+* [Gmail][gmail] (2013-03)
 
 ## Misc ##
 
