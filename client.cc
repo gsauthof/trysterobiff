@@ -47,17 +47,21 @@
 #include <QTimer>
 
 #include <cassert>
-//#include <iostream>
-
+#include <iostream>
 
 #include "name.hh"
 
+using namespace std;
+
 Client::Client()
-    : state(DISCONNECTED),
+    : state(DISCONNECTED), has_idle(false),
       socket(0), timer(0),
       port(0), timeout(30 * 1000),
       old_recent(0), counter(0),
-      preview_enabled(true), re_idle_intervall(28 * 60 * 1000)
+      preview_enabled(true), re_idle_intervall(28 * 60 * 1000),
+      use_recent(true),
+      has_recent(true),
+      detect_gmail(true)
 {
 }
 
@@ -73,6 +77,8 @@ void Client::run()
   preview_enabled = s.value("preview", QVariant(true)).toBool();
   timeout = s.value("timeout", QVariant(30)).toInt()*1000;
   re_idle_intervall = s.value("re_idle", QVariant(28)).toInt()*60*1000;
+  use_recent = s.value("use_recent", QVariant(true)).toBool();
+  detect_gmail = s.value("detect_gmail", QVariant(true)).toBool();
 
   QTimer::singleShot(0, this, SLOT(setup()));
   exec();
@@ -200,6 +206,16 @@ bool Client::tag_ok(const QByteArray &a, QByteArray &t, State s)
   return false;
 }
 
+bool Client::check_gmail(const QByteArray &u)
+{
+  if (detect_gmail && u.contains(" GIMAP ")) {
+    EMITDEBUG("Connected to Gmail-Server - using UNSEEN instead of RECENT");
+    has_recent = false;
+    return true;
+  }
+  return false;
+}
+
 // #include <iostream>
 
 void Client::parse(const QByteArray &a)
@@ -213,12 +229,17 @@ void Client::parse(const QByteArray &a)
   QByteArray untag("*");
   switch (state) {
     case CONNECTED :
-      if (tag_ok(u, untag, PRELOGIN))
+      has_idle = false;
+      if (tag_ok(u, untag, PRELOGIN)) {
+        check_gmail(u);
         QTimer::singleShot(0, this, SLOT(login()));
+      }
       break;
     case LOGGINGIN:
+      check_capabilities(u);
       if (tag_ok(u, login_tag, PREEXAMINE)) {
-        if (check_capabilities(u))
+        check_capabilities(u);
+        if (has_idle)
           QTimer::singleShot(0, this, SLOT(examine()));
       }
       break;
@@ -247,7 +268,9 @@ void Client::parse(const QByteArray &a)
       parse_header_field(a);
       parse_header_end(u);
       if (tag_ok(u, fetch_tag, STARTINGIDLE)) {
-        emit new_headers(headers);
+        emit new_messages(size_t(headers.size()));
+        if (preview_enabled)
+          emit new_headers(headers);
         headers.clear();
         QTimer::singleShot(0, this, SLOT(idle()));
       }
@@ -272,6 +295,11 @@ bool Client::parse_error(const QByteArray &u)
 
 bool Client::parse_recent(const QByteArray &u)
 {
+  const char *status_clause = 0;
+  if (has_recent)
+    status_clause = "RECENT";
+  else
+    status_clause = "EXISTS";
   if (!u.startsWith("*"))
     return false;
   int x = u.indexOf(' ');
@@ -280,31 +308,43 @@ bool Client::parse_recent(const QByteArray &u)
   int y = u.indexOf(' ', x+1);
   if (y<0)
     return false;
-  if (!u.mid(y+1).startsWith("RECENT"))
+  if (!u.mid(y+1).startsWith(status_clause))
     return false;
   bool b = true;
   int msg = u.mid(x+1, y-x-1).toInt(&b);
-  assert(msg >= 0);
-  if (!b)
-    emit error("RECENT parse error");
+  //assert(msg >= 0);
   EMITDEBUG("# msgs: " + QString::number(msg) + '\n');
-  emit new_messages(size_t(msg));
   old_recent = msg;
-  if (preview_enabled) {
+  if (!b)
+    emit error("RECENT/EXISTS parse error");
+  if (preview_enabled || has_recent) {
     if (state == IDLING)
       done();
     else
       search();
+  } else {
+    emit new_messages(size_t(msg));
   }
   return true;
 }
 
 bool Client::check_capabilities(const QByteArray &u)
 {
-  if (!u.contains(" IDLE ")) {
-    socket->disconnect();
+  // we need to parse two styles:
+  // 1.) A1 OK [CAPABILITY ... IDLE ...
+  //     -> as answer to login
+  // 2.) * CAPABILITY ... IDLE ...
+  //     -> untagged answer (e.g. gmail servers)
+
+  if (!u.contains("CAPABILITY"))
+    return false;
+  if (!u.contains(" IDLE")) {
+    socket->disconnectFromHost();
+    EMITDEBUG("server does NOT have CAPABILITY IDLE");
     return false;
   }
+  EMITDEBUG("server DOES have CAPABILITY IDLE");
+  has_idle = true;
   return true;
 }
 
@@ -393,14 +433,19 @@ void Client::search()
   assert(search_tag.isEmpty());
   search_tag = tag();
   state = SEARCHING;
-  write_line(search_tag + " search RECENT");
+  if (has_recent)
+    write_line(search_tag + " search RECENT");
+  else
+    write_line(search_tag + " search UNSEEN");
 }
 
 void Client::fetch()
 {
   state = FETCHING;
   if (query.isEmpty()) {
-    error_close("Empty query.");
+    //error_close("Empty query.");
+    EMITDEBUG("Search returned nothing.");
+    QTimer::singleShot(0, this, SLOT(idle()));
     return;
   }
   assert(fetch_tag.isEmpty());
@@ -435,6 +480,7 @@ void Client::do_connect()
     return;
   }
   socket->connectToHostEncrypted(host, port);
+  has_recent = use_recent;
 }
 
 #include <iostream>

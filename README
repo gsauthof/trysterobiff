@@ -80,6 +80,30 @@ was signed with, check out the notes at the end of:
 
 https://bitbucket.org/gsauthof/mailcp/overview 
 
+
+## Gmail ##
+
+Gmail IMAP access has following [limitation][gmaillim], which matters to
+trysterobiff:
+
+> Gmail IMAP1 is a fairly complete implementation of IMAP, but the
+> following features are currently unsupported:
+>
+>   - \Recent flags on messages. [..]'
+
+[gmaillim]: http://support.google.com/mail/bin/answer.py?hl=en&answer=78761
+
+
+Trysterobiff detects this and on connecting to a GMail-IMAPD, it will
+automatically use search-for-UNSEEN messages.
+
+You can explicitly configure this behavior for other IMAP daemons, too or you can
+even disable the Gmail autodetection (cf. trysterobiff.conf example).
+
+When connecting to non-Gmail-IMAPDs, trysterobiff searches by default for
+RECENT messages (RECENT messages are a subset of the UNSEEN ones).
+
+
 ## Multiple Account ##
 
 If you want to use multiple Trysterobiff instances (for multiple IMAP
@@ -107,4 +131,5 @@ Perhaps it makes sense to add an option to Trysterobiff for user defined config 
 
 [tango]: http://tango.freedesktop.org/Tango_Desktop_Project
 [dove]: http://www.dovecot.org/
+[gmail]: http://en.wikipedia.org/wiki/Gmail
 

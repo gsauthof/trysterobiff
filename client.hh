@@ -84,6 +84,8 @@ class Client : public QThread {
 
     State state;
 
+    bool has_idle;
+
     QSslSocket *socket;
     QTimer *timer;
     QString host, user, pw, mbox;
@@ -95,6 +97,9 @@ class Client : public QThread {
                subject, from, date, headers;
     bool preview_enabled;
     size_t re_idle_intervall;
+    bool use_recent;
+    bool has_recent;
+    bool detect_gmail;
 
     void write_line(const QByteArray &);
     void error_close(const QString &);
@@ -107,6 +112,7 @@ class Client : public QThread {
     bool parse_error(const QByteArray &u);
     bool parse_recent(const QByteArray &);
     bool check_capabilities(const QByteArray &u);
+    bool check_gmail(const QByteArray &u);
     bool parse_idle_ok(const QByteArray &u);
     void parse_search_res(const QByteArray &u);
     void parse_header_field(const QByteArray &a);
