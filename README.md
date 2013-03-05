@@ -1,5 +1,3 @@
--*- markdown -*-
-
 Trysterobiff is a cross-plattform non-polling IMAP new-mail systray notifier.
 
 Instead of polling it uses the IDLE extension of IMAP. With the IDLE extension
