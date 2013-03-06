@@ -92,6 +92,7 @@ class Client : public QThread {
     int port;
     int timeout;
     size_t old_recent;
+    size_t fetched_rows;
     size_t counter;
     QByteArray login_tag, examine_tag, idle_tag, search_tag, fetch_tag, query,
                subject, from, date, headers;

@@ -32,6 +32,8 @@
 #include <QSettings>
 #include <QMessageBox>
 
+#include <QDebug>
+
 #include "name.hh"
 #include "infobox.hh"
 

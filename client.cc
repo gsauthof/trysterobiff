@@ -57,7 +57,7 @@ Client::Client()
     : state(DISCONNECTED), has_idle(false),
       socket(0), timer(0),
       port(0), timeout(30 * 1000),
-      old_recent(0), counter(0),
+      old_recent(0), fetched_rows(0), counter(0),
       preview_enabled(true), re_idle_intervall(28 * 60 * 1000),
       use_recent(true),
       has_recent(true),
@@ -268,7 +268,7 @@ void Client::parse(const QByteArray &a)
       parse_header_field(a);
       parse_header_end(u);
       if (tag_ok(u, fetch_tag, STARTINGIDLE)) {
-        emit new_messages(size_t(headers.size()));
+        emit new_messages(fetched_rows);
         if (preview_enabled)
           emit new_headers(headers);
         headers.clear();
@@ -385,6 +385,7 @@ void Client::parse_header_end(const QByteArray &u)
       subject.clear();
       from.clear();
       date.clear();
+      ++fetched_rows;
   }
 }
 
@@ -450,6 +451,7 @@ void Client::fetch()
   }
   assert(fetch_tag.isEmpty());
   fetch_tag = tag();
+  fetched_rows = 0;
   write_line(fetch_tag + " fetch " + query
       + " (internaldate flags body[header.fields (date from subject)])");
   query.clear();
