@@ -317,7 +317,7 @@ bool Client::parse_recent(const QByteArray &u)
   old_recent = msg;
   if (!b)
     emit error("RECENT/EXISTS parse error");
-  if (preview_enabled || has_recent) {
+  if (preview_enabled || !has_recent) {
     if (state == IDLING)
       done();
     else
