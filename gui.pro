@@ -23,8 +23,8 @@ message (Using Qt CONFIG: $$CONFIG)
 
 TARGET = trysterobiff
 
-HEADERS += tray.hh client.hh name.hh external.hh infobox.hh
-SOURCES += gui.cc tray.cc client.cc external.cc infobox.cc
+HEADERS += tray.hh client.hh name.hh external.hh infobox.hh dummy.hh
+SOURCES += gui.cc tray.cc client.cc external.cc infobox.cc dummy.cc
 
 
 RESOURCES = gui.qrc

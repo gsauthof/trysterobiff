@@ -33,12 +33,59 @@
 #include "client.hh"
 #include "external.hh"
 
+#include "dummy.hh"
+
 #include <iostream>
 
 #include "name.hh"
 
+using namespace std;
+
+void help(const char *prog)
+{
+  cerr << "Call: " << prog <<
+    "(Option)*\n\n"
+    "where Option is one of:\n"
+    "\n"
+    "  --help    this screen\n"
+    "  --debug   print diagnostic output to stderr\n\n";
+}
+
+
+struct Options {
+  bool debug;
+  Options()
+    :
+      debug(false)
+  {
+  }
+  void parse_args(int argc, char **argv)
+  {
+    for (int i = 1; i<argc; ++i)
+      if (!strcmp(argv[i], "--debug"))
+        debug = true;
+      else if (!strcmp(argv[i], "--help")) {
+        help(argv[0]);
+        exit(0);
+      } else {
+        cerr << "Unknown option: " << argv[i] << '\n';
+        help(argv[0]);
+        exit(1);
+      }
+  }
+  Options(int argc, char **argv)
+    :
+      debug(false)
+  {
+    parse_args(argc, argv);
+  }
+
+};
+
+
 int main(int argc, char **argv)
 {
+  Options opts(argc, argv);
   QApplication app(argc, argv);
   app.setQuitOnLastWindowClosed(false);
 
@@ -72,6 +119,11 @@ int main(int argc, char **argv)
 
 #ifndef NOIMAPDEBUG
   QObject::connect(&c, SIGNAL(debug(const QString&)), &t, SLOT(debug(const QString&)));
+  if (opts.debug)
+  {
+    Dummy *d = new Dummy();
+    QObject::connect(&c, SIGNAL(debug(const QString&)), d, SLOT(error(const QString&)));
+  }
 #endif
   QObject::connect(&c, SIGNAL(error(const QString&)), &t, SLOT(error(const QString&)));
   QObject::connect(&c, SIGNAL(new_messages(size_t)), &t, SLOT(new_messages(size_t)));
