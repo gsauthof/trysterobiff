@@ -61,7 +61,8 @@ Client::Client()
       preview_enabled(true), re_idle_intervall(28 * 60 * 1000),
       use_recent(true),
       has_recent(true),
-      detect_gmail(true)
+      detect_gmail(true),
+      update_always(false)
 {
 }
 
@@ -79,6 +80,7 @@ void Client::run()
   re_idle_intervall = s.value("re_idle", QVariant(28)).toInt()*60*1000;
   use_recent = s.value("use_recent", QVariant(true)).toBool();
   detect_gmail = s.value("detect_gmail", QVariant(true)).toBool();
+  update_always = s.value("update_always", QVariant(false)).toBool();
 
   QTimer::singleShot(0, this, SLOT(setup()));
   exec();
@@ -211,6 +213,7 @@ bool Client::check_gmail(const QByteArray &u)
   if (detect_gmail && u.contains(" GIMAP ")) {
     EMITDEBUG("Connected to Gmail-Server - using UNSEEN instead of RECENT");
     has_recent = false;
+    update_always = true;
     return true;
   }
   return false;
@@ -268,9 +271,11 @@ void Client::parse(const QByteArray &a)
       parse_header_field(a);
       parse_header_end(u);
       if (tag_ok(u, fetch_tag, STARTINGIDLE)) {
-        emit new_messages(fetched_rows);
-        if (preview_enabled)
-          emit new_headers(headers);
+        if (fetched_rows) {
+          emit new_messages(fetched_rows);
+          if (preview_enabled)
+            emit new_headers(headers);
+        }
         headers.clear();
         QTimer::singleShot(0, this, SLOT(idle()));
       }
@@ -314,15 +319,20 @@ bool Client::parse_recent(const QByteArray &u)
   int msg = u.mid(x+1, y-x-1).toInt(&b);
   //assert(msg >= 0);
   EMITDEBUG("# msgs: " + QString::number(msg) + '\n');
-  old_recent = msg;
   if (!b)
     emit error("RECENT/EXISTS parse error");
+  EMITDEBUG("Minutes since last status push: "
+      + QString::number(double(time.restart())/1000.0/60));
   if (preview_enabled || !has_recent) {
     if (state == IDLING)
       done();
-    else
-      search();
+    else {
+      if (update_always || old_recent != size_t(msg))
+        search();
+    }
+    old_recent = msg;
   } else {
+    old_recent = msg;
     emit new_messages(size_t(msg));
   }
   return true;
@@ -394,6 +404,7 @@ void Client::login()
   assert(login_tag.isEmpty());
   login_tag = tag();
   state = LOGGINGIN;
+  time.start();
   write_line(login_tag + " login " + user.toUtf8() + " " + pw.toUtf8());
 }
 
@@ -425,8 +436,8 @@ void Client::done()
 
 void Client::search()
 {
-  if (!old_recent)
-    return;
+  //if (!old_recent)
+  //  return;
   if (!search_tag.isEmpty() || !fetch_tag.isEmpty()) {
     emit error("Last search is still active!");
     return;

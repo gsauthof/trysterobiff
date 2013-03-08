@@ -53,6 +53,8 @@ void Infobox::add_line(const QString &a)
   c.movePosition(QTextCursor::End);
   int n = c.position();
   c.insertText(a);
+  if (!a.endsWith('\n'))
+    c.insertText("\n");
   if (n > 1024) {
     c.movePosition(QTextCursor::Start);
     c.select(QTextCursor::LineUnderCursor);

@@ -37,6 +37,8 @@ class Slave;
 
 #include <QSslSocket>
 
+#include <QTime>
+
 
 #ifdef NOIMAPDEBUG
 #define EMITDEBUG(A) do {} while(0)
@@ -82,6 +84,8 @@ class Client : public QThread {
       FETCHING
     };
 
+    QTime time;
+
     State state;
 
     bool has_idle;
@@ -101,6 +105,7 @@ class Client : public QThread {
     bool use_recent;
     bool has_recent;
     bool detect_gmail;
+    bool update_always;
 
     void write_line(const QByteArray &);
     void error_close(const QString &);
