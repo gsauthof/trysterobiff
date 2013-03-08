@@ -95,11 +95,25 @@ trysterobiff:
 Trysterobiff detects this and on connecting to a GMail-IMAPD, it will
 automatically use search-for-UNSEEN messages.
 
-You can explicitly configure this behavior for other IMAP daemons, too or you can
-even disable the Gmail autodetection (cf. trysterobiff.conf example).
+You can explicitly configure this behavior for other IMAP daemons, too or you
+can even disable the Gmail autodetection (cf. trysterobiff.conf example).
 
-When connecting to non-Gmail-IMAPDs, trysterobiff searches by default for
+When connecting to non-Gmail-IMAPDs, Trysterobiff searches by default for
 RECENT messages (RECENT messages are a subset of the UNSEEN ones).
+
+Please note that this work-around is just that - a workaround. That means:
+gmail imapd seems to push every 5 minutes a status update. On every status
+update Trysterobiff has the chance to display new messages. Thus, in the worst
+case a notification for an incoming mail takes 5 minutes. In the average case
+it takes 2.5 minutes then.
+
+To get a shorter notification time with gmail you can:
+
+- use a polling imap-notifier and configure a poll-interval less than 2.5
+  minutes
+- switch to a real IMAP daemon (or imap provider) which does
+  support the RECENT flag. With that you are immediately notified on new
+  message arrivals - without the need for polling
 
 
 ## Multiple Account ##
