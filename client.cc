@@ -118,9 +118,9 @@ void Client::write_line(const QByteArray &a)
     if (x > -1)
       t.truncate(x+1);
     t.append("***");
-    EMITDEBUG(QString::fromUtf8(t) + '\n');
+    EMITDEBUG(">> " + QString::fromUtf8(t) + '\n');
   } else
-    EMITDEBUG(QString::fromUtf8(a) + '\n');
+    EMITDEBUG(">> " + QString::fromUtf8(a) + '\n');
   socket->write(a + "\r\n");
 }
 
@@ -180,7 +180,7 @@ void Client::so_read()
   }
   while (socket->canReadLine()) {
     QByteArray a = socket->readLine();
-    EMITDEBUG(QString::fromUtf8(a) + '\n');
+    EMITDEBUG("<< " + QString::fromUtf8(a) + '\n');
     parse(a);
   }
 }
@@ -324,13 +324,17 @@ bool Client::parse_recent(const QByteArray &u)
   EMITDEBUG("Minutes since last status push: "
       + QString::number(double(time.restart())/1000.0/60));
   if (preview_enabled || !has_recent) {
-    if (state == IDLING)
+    if (state == IDLING) {
+      old_recent = msg;
+      if (!old_recent)
+          emit new_messages(size_t(msg));
       done();
-    else {
-      if (update_always || old_recent != size_t(msg))
+    } else { // state == EXAMING
+      if (update_always || old_recent != size_t(msg)) {
+        old_recent = msg;
         search();
+      }
     }
-    old_recent = msg;
   } else {
     old_recent = msg;
     emit new_messages(size_t(msg));
@@ -456,6 +460,8 @@ void Client::fetch()
   state = FETCHING;
   if (query.isEmpty()) {
     //error_close("Empty query.");
+    fetched_rows = 0;
+    emit new_messages(fetched_rows);
     EMITDEBUG("Search returned nothing.");
     QTimer::singleShot(0, this, SLOT(idle()));
     return;

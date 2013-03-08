@@ -123,6 +123,8 @@ int main(int argc, char **argv)
   {
     Dummy *d = new Dummy();
     QObject::connect(&c, SIGNAL(debug(const QString&)), d, SLOT(error(const QString&)));
+    QObject::connect(&c, SIGNAL(error(const QString&)), d, SLOT(error(const QString&)));
+    QObject::connect(&c, SIGNAL(new_messages(size_t)),  d, SLOT(new_messages(size_t)));
   }
 #endif
   QObject::connect(&c, SIGNAL(error(const QString&)), &t, SLOT(error(const QString&)));
