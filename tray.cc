@@ -31,6 +31,8 @@
 #include <QAction>
 #include <QSettings>
 #include <QMessageBox>
+#include <QWidgetAction>
+#include <QLabel>
 
 #include <QDebug>
 
@@ -92,7 +94,14 @@ void Tray::setup_menu()
   QAction *quit = new QAction(tr("&Quit"), this);
   connect(quit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
+  QSettings s;
+  QWidgetAction *host = new QWidgetAction(this);
+  QLabel *label = new QLabel(s.value("host").toString());
+  host->setDefaultWidget(label);
+
   QMenu *menu = new QMenu(dynamic_cast<QWidget*>(tray));
+  menu->addAction(host);
+  menu->addSeparator();
   menu->addAction(info);
   menu->addAction(con);
   menu->addAction(discon);

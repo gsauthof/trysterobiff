@@ -81,10 +81,11 @@ https://bitbucket.org/gsauthof/mailcp/overview
 
 ## Mouse control ##
 
-Clicks on tray icon:
+Single-clicks on tray icon:
 
-- single - re-display preview bubble
+- left   - re-display preview bubble
 - middle - re-connect to server (may take 1-2 seconds)
+- right  - show menu
 
 
 ## Gmail ##
