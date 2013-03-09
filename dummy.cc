@@ -4,7 +4,7 @@
       a cross-plattform non-polling IMAP new-mail systray notifier.
 
     Copyright (C) 2011  Georg Sauthoff
-         email: gsauthof@techfak.uni-bielefeld.de or gsauthof@sdf.lonestar.org
+         email: mail@georg.so or gsauthof@sdf.lonestar.org
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
