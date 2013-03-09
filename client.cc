@@ -164,7 +164,7 @@ void Client::so_encrypted()
 void Client::ssl_errors(const QList<QSslError> &errors)
 {
   foreach(const QSslError &e, errors)
-    emit error(e.errorString());
+    emit error("SSL Error: " + e.errorString());
 }
 
 void Client::tcp_error(QAbstractSocket::SocketError e)

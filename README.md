@@ -95,26 +95,30 @@ trysterobiff:
 Trysterobiff detects this and on connecting to a GMail-IMAPD, it will
 automatically use search-for-UNSEEN messages.
 
-You can explicitly configure this behavior for other IMAP daemons, too or you
+You can explicitly configure this behavior for other IMAP daemons, too, or you
 can even disable the Gmail autodetection (cf. trysterobiff.conf example).
 
 When connecting to non-Gmail-IMAPDs, Trysterobiff searches by default for
 RECENT messages (RECENT messages are a subset of the UNSEEN ones).
 
-Please note that this work-around is just that - a workaround. That means:
-gmail imapd seems to push every 5 minutes a status update. On every status
-update Trysterobiff has the chance to display new messages. Thus, in the worst
-case a notification for an incoming mail takes 5 minutes. In the average case
-it takes 2.5 minutes then.
+With that work-around Trysterobiff behaves like this when connected to a gmail-imapd:
 
-To get a shorter notification time with gmail you can:
+- When reading messages in the gmail web-client, gmail does NOT immediately
+  push the status change (i.e. read -> unread attribute change of a message)
+  over imap. But gmail pushes every 5 minutes a regular
+  status update. On that update Trysterobiff has the chance to update
+  notifications. Thus, in the best, worst or average case this update is immediate,
+  5 or 2.5 minutes late.
+- When using the android gmail app, you have to hit the sync button (or wait
+  for an automated sync) until changes are propagated via IMAP. But the sync
+  then immediately pushes a new status over imap.
+- On incoming new mail gmail nearly immediately pushes a status update over IMAP.
+- When deleting messages (via a concurrent imap connection) gmail also pushes a new
+  status immediately.
 
-- use a polling imap-notifier and configure a poll-interval less than 2.5
-  minutes
-- switch to a real IMAP daemon (or imap provider) which does
-  support the RECENT flag. With that you are immediately notified on new
-  message arrivals - without the need for polling
-
+Thus, only the first point is a real limitation of the workaround. 'Standard'
+IMAP servers that has RECENT flag support don't have that limitation, of
+course.
 
 ## Multiple Account ##
 
@@ -125,7 +129,8 @@ accounts), just set the HOME environment variable like this:
 
 Assuming that /home/juser/accountb/.config/trysterobiff.conf is setup.
 
-Perhaps it makes sense to add an option to Trysterobiff for user defined config file names under $HOME/.conf/.
+Perhaps it makes sense to add an option to Trysterobiff for user defined config
+file names under $HOME/.conf/.
 
 
 ## Tested IMAP-Servers ##
