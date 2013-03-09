@@ -51,8 +51,6 @@
 
 #include "decode.hh"
 
-#include "name.hh"
-
 
 using namespace std;
 
@@ -72,8 +70,7 @@ Client::Client()
 
 void Client::run()
 {
-  QSettings::setDefaultFormat(QSettings::IniFormat);
-  QSettings s(IMAPBIFFNAME, IMAPBIFFNAME);
+  QSettings s;
   host = s.value("host").toString();
   port = s.value("port").toInt();
   user = s.value("user").toString();
@@ -518,7 +515,7 @@ Client::~Client()
 
 void Client::preview_toggle(bool b)
 {
-  QSettings s(IMAPBIFFNAME, IMAPBIFFNAME);
+  QSettings s;
   s.setValue("preview", QVariant(b));
   preview_enabled = b;
   if (b && old_recent)

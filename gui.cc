@@ -29,6 +29,7 @@
 #include <QTimer>
 #include <QSettings>
 #include <QTextCodec>
+#include <QDir>
 
 #include "tray.hh"
 #include "client.hh"
@@ -48,13 +49,17 @@ void help(const char *prog)
     "(Option)*\n\n"
     "where Option is one of:\n"
     "\n"
-    "  --help    this screen\n"
-    "  --debug   print diagnostic output to stderr\n\n";
+   //--------------------------------------------------------------------------------
+    "  --help            this screen\n"
+    "  --settings DIR    read trysterobiff.conf from DIR\n"
+    "  --debug           print diagnostic output to stderr\n\n";
+   //--------------------------------------------------------------------------------
 }
 
 
 struct Options {
   bool debug;
+  QString settings_path;
   Options()
     :
       debug(false)
@@ -68,6 +73,18 @@ struct Options {
       else if (!strcmp(argv[i], "--help")) {
         help(argv[0]);
         exit(0);
+      } else if (!strcmp(argv[i], "--settings")) {
+        ++i;
+        if (i>=argc) {
+          cerr << "Missing argument to --settings\n";
+          exit(1);
+        }
+        settings_path = argv[i];
+        QDir dir(settings_path);
+        if (!dir.exists()) {
+          cerr << "Settings directory '" << argv[i] << "' does not exist\n";
+          exit(1);
+        }
       } else {
         cerr << "Unknown option: " << argv[i] << '\n';
         help(argv[0]);
@@ -82,6 +99,40 @@ struct Options {
   }
 
 };
+
+
+static void setup_settings(const Options &opts)
+{
+  QCoreApplication::setOrganizationName(IMAPBIFFNAME);
+  QCoreApplication::setApplicationName(IMAPBIFFNAME);
+
+  QSettings::setDefaultFormat(QSettings::IniFormat);
+  if (!opts.settings_path.isEmpty()) {
+    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope,
+        opts.settings_path);
+  }
+  QSettings s;
+  if (!s.value("host").isValid()) {
+    std::cerr << "Config file is missing. Copy example file to ";
+    if (opts.settings_path.isEmpty())
+      cerr << "$HOME/.config";
+    else
+      cerr << opts.settings_path.toUtf8().constData();
+    cerr << "/" IMAPBIFFNAME ".conf , \n"
+      " chmod 600 it and adjust the settings.\n";
+    exit(6);
+  }
+
+  QString cert = s.value("cert").toString();
+  if (cert != "") {
+    bool b = QSslSocket::addDefaultCaCertificates(cert);
+    if (!b) {
+      std::cerr << "Could not load additional root certificate: "
+        << cert.toUtf8().constData() << '\n';
+      exit(7);
+    }
+  }
+}
 
 
 int main(int argc, char **argv)
@@ -102,20 +153,7 @@ int main(int argc, char **argv)
     return 23;
   }
 
-  QSettings::setDefaultFormat(QSettings::IniFormat);
-  QSettings s(IMAPBIFFNAME, IMAPBIFFNAME);
-  if (!s.value("host").isValid()) {
-    std::cerr << "Config file is missing. Copy example file to "
-      "$HOME/.config/" IMAPBIFFNAME ".conf , \n"
-      " chmod 600 it and adjust the settings.\n";
-    return 6;
-  }
-  QString cert = s.value("cert").toString();
-  if (cert != "") {
-    bool b = QSslSocket::addDefaultCaCertificates(cert);
-    if (!b)
-      std::cerr << "Could not load additional root certificate: " << cert.toUtf8().constData() << '\n';
-  }
+  setup_settings(opts);
 
   Tray t;
   Client c;

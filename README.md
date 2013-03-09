@@ -56,15 +56,15 @@ available options.
 
 Copy it to the right location:
 
-    $ cp trysterobiff.conf $HOME/.config/trysterobiff.conf
+    $ cp trysterobiff.ini $HOME/.config/trysterobiff.ini
 
 Restrict the read access:
 
-    $ chmod 600 $HOME/.config/trysterobiff.conf
+    $ chmod 600 $HOME/.config/trysterobiff.ini
 
 And adjust the default settings (hostname etc.):
 
-    $ vim $HOME/.config/trysterobiff.conf
+    $ vim $HOME/.config/trysterobiff.ini
 
 
 ## SSL ##
@@ -123,14 +123,21 @@ course.
 ## Multiple Account ##
 
 If you want to use multiple Trysterobiff instances (for multiple IMAP
-accounts), just set the HOME environment variable like this:
+accounts), just specify an alternative config path:
+
+    $ trysterobiff --settings $HOME/.config/accountb
+
+In the above call $HOME/.config/accountb/trysterobiff.ini is used as config file.
+
+Alternatively, you can set the XDG_CONFIG_HOME environment variable, e.g.:
+
+    $ XDG_CONFIGHOME=$HOME/.config/accountb trysterobiff
+
+Or you can even change your HOME environment variable:
 
     $ HOME=/home/juser/accountb ./trysterobiff
 
-Assuming that /home/juser/accountb/.config/trysterobiff.conf is setup.
-
-Perhaps it makes sense to add an option to Trysterobiff for user defined config
-file names under $HOME/.conf/.
+(for using /home/juser/accountb/.config/trysterobiff.ini)
 
 
 ## Tested IMAP-Servers ##

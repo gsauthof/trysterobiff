@@ -21,20 +21,16 @@
 
 }}} */
 
-
-
 #include "external.hh"
 
 #include <QProcess>
 #include <QSettings>
 
-#include "name.hh"
 
 External::External()
   : p(0)
 {
-  QSettings::setDefaultFormat(QSettings::IniFormat);
-  QSettings s(IMAPBIFFNAME, IMAPBIFFNAME);
+  QSettings s;
   QVariant v = s.value("external_cmd");
   if (!v.isValid())
     return;

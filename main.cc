@@ -43,8 +43,10 @@ int main(int argc, char **argv)
     std::cerr << "WTF?!? Qt lib does not support SSL ...\n";
     return 23;
   }
+  QCoreApplication::setOrganizationName(IMAPBIFFNAME);
+  QCoreApplication::setApplicationName(IMAPBIFFNAME);
   QSettings::setDefaultFormat(QSettings::IniFormat);
-  QSettings s(IMAPBIFFNAME, IMAPBIFFNAME);
+  QSettings s;
   QString cert = s.value("cert").toString();
   if (cert != "") {
     bool b = QSslSocket::addDefaultCaCertificates(cert);

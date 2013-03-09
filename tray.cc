@@ -45,8 +45,7 @@ Tray::Tray()
   setup_infobox();
   setup_menu();
 
-  QSettings::setDefaultFormat(QSettings::IniFormat);
-  QSettings s(IMAPBIFFNAME, IMAPBIFFNAME);
+  QSettings s;
   icon_newmail = QIcon(s.value("gui/newmail", QVariant(":/icons/mail-message-new.svg")).toString());
   icon_normal = QIcon(s.value("gui/normal", QVariant(":/icons/mail-forward.svg")).toString());
   icon_error = QIcon(s.value("gui/error", QVariant(":/icons/process-stop.svg")).toString());
@@ -204,7 +203,7 @@ void Tray::about()
   QMessageBox::information(0, tr(IMAPBIFFNAME),
       tr(IMAPBIFFNAME"\n"
          "A non-polling IMAP new-mail systray notifier.\n"
-         "Copyright 2011, Georg Sauthoff\n"
+         "Copyright 2011,2013 Georg Sauthoff\n"
          "Licenced under the GPLv3+."));
 
 }
