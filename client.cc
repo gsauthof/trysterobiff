@@ -144,6 +144,7 @@ void Client::so_changed(QAbstractSocket::SocketState i)
       EMITDEBUG("Connected to: " + host + '\n');
       break;
     case QAbstractSocket::UnconnectedState :
+      EMITDEBUG("Disconnected from " + host);
       state = DISCONNECTED;
       idle_tag.clear();
       login_tag.clear();

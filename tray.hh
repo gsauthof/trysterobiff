@@ -65,6 +65,8 @@ class Tray : public QObject {
     bool show_preview;
     size_t preview_time;
     QByteArray headers;
+    bool pre_reconnect;
+    void reconnect();
     void add_info(const QString &);
     void setup_menu();
     void setup_infobox();

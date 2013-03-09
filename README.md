@@ -79,6 +79,14 @@ was signed with, check out the notes at the end of:
 https://bitbucket.org/gsauthof/mailcp/overview 
 
 
+## Mouse control ##
+
+Clicks on tray icon:
+
+- single - re-display preview bubble
+- middle - re-connect to server (may take 1-2 seconds)
+
+
 ## Gmail ##
 
 Gmail IMAP access has following [limitation][gmaillim], which matters to

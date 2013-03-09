@@ -39,7 +39,8 @@
 
 Tray::Tray()
   : tray(0), con(0), discon(0), action_info(0), infobox(0),
-  new_msg(0), show_preview(true), preview_time(5)
+  new_msg(0), show_preview(true), preview_time(5),
+  pre_reconnect(false)
 {
   tray = new QSystemTrayIcon(); // WTF?!? crashes in QObjectPrivate::deleteChildren when: this);
   setup_infobox();
@@ -109,6 +110,12 @@ Tray::~Tray()
   delete tray;
 }
 
+void Tray::reconnect()
+{
+  pre_reconnect = true;
+  emit disconnect_requested();
+}
+
 void Tray::action(QSystemTrayIcon::ActivationReason r)
 {
   switch (r) {
@@ -118,7 +125,8 @@ void Tray::action(QSystemTrayIcon::ActivationReason r)
     case QSystemTrayIcon::DoubleClick :
       break;
     case QSystemTrayIcon::MiddleClick :
-      tray->setIcon(icon_normal);
+      //tray->setIcon(icon_normal);
+      reconnect();
       break;
     default:
       break;
@@ -186,6 +194,10 @@ void Tray::disconnected()
   new_msg = 0;
   con->setEnabled(true);
   discon->setEnabled(false);
+  if (pre_reconnect) {
+    pre_reconnect = false;
+    emit connect_requested();
+  }
 }
 
 void Tray::preview_toggle(bool b)
