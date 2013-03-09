@@ -68,7 +68,6 @@ namespace Decode {
       dst = src;
       return;
     }
-    dst.clear();
     int last = 0;
     for (;;) {
       int start = src.indexOf("=?", last);

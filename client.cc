@@ -57,7 +57,7 @@
 using namespace std;
 
 Client::Client()
-    : state(DISCONNECTED), has_idle(false),
+    : state(DISCONNECTED), last_header(HEADER_NONE), has_idle(false),
       socket(0), timer(0),
       port(0), timeout(30 * 1000),
       old_recent(0), fetched_rows(0), counter(0),
@@ -407,12 +407,21 @@ void Client::parse_header_field(const QByteArray &a)
   QByteArray u = a.toUpper();
   if (u.startsWith("SUBJECT: ")) {
     Decode::words(a.mid(9).trimmed(), subject);
-  }
-  if (u.startsWith("FROM: ")) {
+    last_header = HEADER_SUBJECT;
+  } else if (u.startsWith("FROM: ")) {
     Decode::words(a.mid(6).trimmed(), from);
-  }
-  if (u.startsWith("DATE: "))
+    last_header = HEADER_FROM;
+  } else if (u.startsWith("DATE: ")) {
     date = a.mid(6).trimmed();
+    last_header = HEADER_DATE;
+  } else if (u.startsWith(' ')) {
+    // unfold long header lines
+    // (https://tools.ietf.org/html/rfc2822#section-2.2.3)
+    if (last_header == HEADER_SUBJECT && subject.size() < 200)
+      Decode::words(a.trimmed(), subject);
+  } else {
+    last_header = HEADER_UNKNOWN;
+  }
 }
 
 void Client::parse_header_end(const QByteArray &u)
@@ -422,6 +431,7 @@ void Client::parse_header_end(const QByteArray &u)
       subject.clear();
       from.clear();
       date.clear();
+      last_header = HEADER_NONE;
       ++fetched_rows;
   }
 }

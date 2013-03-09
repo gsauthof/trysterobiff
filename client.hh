@@ -83,11 +83,19 @@ class Client : public QThread {
       PREFETCH,
       FETCHING
     };
+    enum Header {
+      HEADER_NONE,
+      HEADER_UNKNOWN,
+      HEADER_SUBJECT,
+      HEADER_FROM,
+      HEADER_DATE
+    };
 
     QTime time;
     QDateTime last_connect;
 
     State state;
+    Header last_header;
 
     bool has_idle;
 
