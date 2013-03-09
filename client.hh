@@ -85,6 +85,7 @@ class Client : public QThread {
     };
 
     QTime time;
+    QDateTime last_connect;
 
     State state;
 
@@ -106,6 +107,7 @@ class Client : public QThread {
     bool has_recent;
     bool detect_gmail;
     bool update_always;
+    bool auto_reconnect;
 
     void write_line(const QByteArray &);
     void error_close(const QString &);
@@ -123,6 +125,8 @@ class Client : public QThread {
     void parse_search_res(const QByteArray &u);
     void parse_header_field(const QByteArray &a);
     void parse_header_end(const QByteArray &u);
+
+    void reconnect();
 
   private slots:
     void setup();

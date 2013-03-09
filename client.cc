@@ -62,7 +62,8 @@ Client::Client()
       use_recent(true),
       has_recent(true),
       detect_gmail(true),
-      update_always(false)
+      update_always(false),
+      auto_reconnect(false)
 {
 }
 
@@ -81,6 +82,7 @@ void Client::run()
   use_recent = s.value("use_recent", QVariant(true)).toBool();
   detect_gmail = s.value("detect_gmail", QVariant(true)).toBool();
   update_always = s.value("update_always", QVariant(false)).toBool();
+  auto_reconnect = s.value("auto_reconnect", QVariant(true)).toBool();
 
   QTimer::singleShot(0, this, SLOT(setup()));
   exec();
@@ -161,15 +163,31 @@ void Client::so_encrypted()
   state = CONNECTED;
 }
 
+void Client::reconnect()
+{
+  if (auto_reconnect) {
+    QDateTime current(QDateTime::currentDateTimeUtc());
+    QDateTime t(last_connect);
+    t.addSecs(60*5);
+    if (t<current)
+      EMITDEBUG("reconnecting after error");
+    do_connect();
+  }
+}
+
 void Client::ssl_errors(const QList<QSslError> &errors)
 {
   foreach(const QSslError &e, errors)
+  {
     emit error("SSL Error: " + e.errorString());
+  }
+  reconnect();
 }
 
 void Client::tcp_error(QAbstractSocket::SocketError e)
 {
-  emit error(socket->errorString() + " == " + QString::number(int(e)));
+  emit error("TCP error: " + socket->errorString() + " == " + QString::number(int(e)));
+  reconnect();
 }
 
 void Client::so_read()
@@ -499,6 +517,7 @@ void Client::do_connect()
     return;
   }
   socket->connectToHostEncrypted(host, port);
+  last_connect = QDateTime::currentDateTimeUtc();
   has_recent = use_recent;
 }
 
