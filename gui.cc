@@ -28,6 +28,7 @@
 #include <QSslSocket>
 #include <QTimer>
 #include <QSettings>
+#include <QTextCodec>
 
 #include "tray.hh"
 #include "client.hh"
@@ -88,6 +89,9 @@ int main(int argc, char **argv)
   Options opts(argc, argv);
   QApplication app(argc, argv);
   app.setQuitOnLastWindowClosed(false);
+
+  QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+  QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 
   if (!QSystemTrayIcon::isSystemTrayAvailable()) {
     std::cerr << "Could not find a System Tray.\n";

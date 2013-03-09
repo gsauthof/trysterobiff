@@ -49,7 +49,10 @@
 #include <cassert>
 #include <iostream>
 
+#include "decode.hh"
+
 #include "name.hh"
+
 
 using namespace std;
 
@@ -402,10 +405,12 @@ void Client::parse_search_res(const QByteArray &u)
 void Client::parse_header_field(const QByteArray &a)
 {
   QByteArray u = a.toUpper();
-  if (u.startsWith("SUBJECT: "))
-    subject = a.mid(9).trimmed();
-  if (u.startsWith("FROM: "))
-    from = a.mid(6).trimmed();
+  if (u.startsWith("SUBJECT: ")) {
+    Decode::words(a.mid(9).trimmed(), subject);
+  }
+  if (u.startsWith("FROM: ")) {
+    Decode::words(a.mid(6).trimmed(), from);
+  }
   if (u.startsWith("DATE: "))
     date = a.mid(6).trimmed();
 }
