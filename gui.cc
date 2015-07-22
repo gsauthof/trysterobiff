@@ -46,12 +46,12 @@ using namespace std;
 void help(const char *prog)
 {
   cerr << "Call: " << prog <<
-    "(Option)*\n\n"
+    " (Option)*\n\n"
     "where Option is one of:\n"
     "\n"
    //--------------------------------------------------------------------------------
     "  --help            this screen\n"
-    "  --settings DIR    read trysterobiff.conf from DIR\n"
+    "  --settings DIR    read trysterobiff.ini from DIR\n"
     "  --debug           print diagnostic output to stderr\n\n";
    //--------------------------------------------------------------------------------
 }
@@ -141,8 +141,10 @@ int main(int argc, char **argv)
   QApplication app(argc, argv);
   app.setQuitOnLastWindowClosed(false);
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
   QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
   QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
+#endif
 
   if (!QSystemTrayIcon::isSystemTrayAvailable()) {
     std::cerr << "Could not find a System Tray.\n";
