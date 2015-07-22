@@ -118,8 +118,8 @@ static void setup_settings(const Options &opts)
       cerr << "$HOME/.config";
     else
       cerr << opts.settings_path.toUtf8().constData();
-    cerr << "/" IMAPBIFFNAME ".conf , \n"
-      " chmod 600 it and adjust the settings.\n";
+    cerr << "/" IMAPBIFFNAME ".ini,\n"
+      "chmod 600 it and adjust the settings.\n";
     exit(6);
   }
 
