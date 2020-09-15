@@ -1,4 +1,4 @@
-Trysterobiff is a cross-plattform non-polling IMAP new-mail systray notifier.
+Trysterobiff is a cross-platform non-polling IMAP new-mail systray notifier.
 
 Instead of polling it uses the IDLE extension of IMAP. With the IDLE extension
 an IMAP server immediately sends mailbox status updates to the client. Using
@@ -18,13 +18,17 @@ licenced under the GPL v3+.
 2011-01-08, 2013-03-05
 
 
+**2020-09-15:** This repository was previously hosted under
+https://bitbucket.org/gsauthof/trysterobiff.  I migrated it today
+to GitHub (and thus converted it from Mercurial to Git) because
+Bitbucket terminated its Mercurial support and thus removed all
+old Mercurial repositories, earlier this year.
+
 ## Contact ##
 
 I appreciate feedback and comments:
 
-    mail@georg.so
-    gsauthof@sdf.lonestar.org
-
+    mail@gms.tf
 
 ## Install ##
 
@@ -163,6 +167,13 @@ Or you can even change your HOME environment variable:
   is not available on Mac OSX ...
 
 * The included icons are from the [tango project][tango]. They are Public Domain.
+
+
+## See Also
+
+- [firetech/trysterobiff](https://github.com/firetech/trysterobiff)
+  a 2017 fork that contains some Exchange improvements and displays
+  an unread count in the systray icon
 
 
 [tango]: http://tango.freedesktop.org/Tango_Desktop_Project
